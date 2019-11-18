@@ -5,11 +5,12 @@ from Logic.Scoreboard import Scoreboard
 from copy import deepcopy
 from time import sleep
 import random
+import threading
 
 
 class Tetris:
 
-    def __init__(self, printer = None):
+    def __init__(self, printer=None):
         random.seed()
 
         self.grid = [[Constants.EMPTY_SPACE
@@ -25,6 +26,7 @@ class Tetris:
         self.scoreboard = Scoreboard()
 
         self.printer = printer
+        self.game_thread = threading.Thread(target=self._run)
 
     def _init_grid(self):
         for row in range(len(self.grid)):
@@ -84,6 +86,9 @@ class Tetris:
         self._select_shape()
 
     def run(self):
+        self.game_thread.start()
+
+    def _run(self):
         print(f'Height : {len(self.grid)}, Width: {len(self.grid[0])}')
         while not self.scoreboard.game_over:
             sleep(self.scoreboard.get_speed()/1000)
@@ -119,3 +124,31 @@ class Tetris:
                 count += 1
                 self._remove_line(row)
         return count
+
+    def move(self, direction: str) -> bool:
+        my_direction = Direction(Direction.DIRECTION_NAMES[direction])
+        if self._can_move(my_direction):
+            self._move(my_direction)
+            self._print_grid()
+            return True
+        return False
+
+    def move_left(self) -> bool:
+        return self.move("Left")
+
+    def move_right(self) -> bool:
+        return self.move("Right")
+
+    def drop_piece(self):
+        my_direction: Direction = Direction(Direction.DIRECTION_NAMES["Down"])
+        while self._can_move(my_direction):
+            self._move(my_direction)
+            self._print_grid()
+        self._shape_has_landed()
+
+    def rotate(self) -> bool:
+        if self._can_rotate():
+            self._rotate()
+            self._print_grid()
+            return True
+        return False

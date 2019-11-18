@@ -10,7 +10,7 @@ class Scoreboard:
 
     def get_speed(self) -> int:
         if self.level == 0:
-            return 100
+            return 700
         elif self.level == 1:
             return 600
         elif self.level == 2:
