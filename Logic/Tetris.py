@@ -72,3 +72,27 @@ class Tetris:
     def run(self):
         print("under construction")
         self._print_grid()
+
+    def _add_shape(self):
+        for row in self.falling_piece.position:
+            self.grid[self.falling_piece_position[0] + row[0]][self.falling_piece_position[1] + row[1]] = \
+                Constants.FILLED_SPACE
+
+    def _remove_line(self, line: int):
+        for col in range(Constants.COLUMNS):
+            self.grid[line][col] = Constants.EMPTY_SPACE
+
+        for col in range(Constants.COLUMNS):
+            for row in reversed(range(1, line + 1)):
+                self.grid[row][col] = self.grid[row - 1][col]
+
+    def _remove_lines(self) -> int:
+        count = 0
+        for row in range(Constants.ROWS - 1):
+            for col in range(1, Constants.COLUMNS - 1):
+                if self.grid[row][col] == Constants.EMPTY_SPACE:
+                    break
+            else:
+                count += 1
+                self._remove_line(row)
+        return count
