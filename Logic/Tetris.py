@@ -9,7 +9,7 @@ import random
 
 class Tetris:
 
-    def __init__(self):
+    def __init__(self, printer = None):
         random.seed()
 
         self.grid = [[Constants.EMPTY_SPACE
@@ -24,6 +24,8 @@ class Tetris:
 
         self.scoreboard = Scoreboard()
 
+        self.printer = printer
+
     def _init_grid(self):
         for row in range(len(self.grid)):
             for col in range(len(self.grid[0])):
@@ -31,19 +33,8 @@ class Tetris:
                     self.grid[row][col] = Constants.BORDER_SPACE
 
     def _print_grid(self):
-        printed = False
-        for row in range(len(self.grid)):
-            for col in range(len(self.grid[0])):
-                for piece_row in self.falling_piece.position:
-                    if row == self.falling_piece_position[0] + piece_row[0] and \
-                            col == self.falling_piece_position[1] + piece_row[1]:
-                        print('1', end=" ")
-                        printed = True
-                if not printed:
-                    print(self.grid[row][col], end=" ")
-                else:
-                    printed = False
-            print("")
+        if self.printer:
+            self.printer.print_grid(self.grid, self.falling_piece, self.falling_piece_position)
 
     def _select_shape(self):
         self.falling_piece_position = [1, 5]

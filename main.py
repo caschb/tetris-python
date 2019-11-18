@@ -1,9 +1,9 @@
 from Logic.Tetris import Tetris
-from Logic.Piece import Piece
+from UI.TextUI import TextUI
+from UI.GraphicUI import GraphicUI
 
 if __name__ == '__main__':
-    game = Tetris()
+    printer: TextUI = TextUI()
+    graphic_printer: GraphicUI = GraphicUI()
+    game = Tetris(graphic_printer)
     game.run()
-    b: Piece = Piece(0)
-    print(b.position)
-
