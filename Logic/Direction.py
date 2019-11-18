@@ -2,9 +2,9 @@ from typing import Dict, List
 
 
 class Direction:
-    RIGHT: List[int] = [1, 0]
-    LEFT: List[int] = [-1, 0]
-    DOWN: List[int] = [0, -1]
+    RIGHT: List[int] = [0, -1]
+    LEFT: List[int] = [0, 1]
+    DOWN: List[int] = [1, 0]
 
     DIRECTIONS: List[List[int]] = [RIGHT, LEFT, DOWN]
 

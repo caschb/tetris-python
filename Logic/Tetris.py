@@ -1,7 +1,9 @@
 from Logic.Constants import Constants
 from Logic.Piece import Piece
 from Logic.Direction import Direction
+from Logic.Scoreboard import Scoreboard
 from copy import deepcopy
+from time import sleep
 import random
 
 
@@ -20,6 +22,8 @@ class Tetris:
         self.falling_piece_position = [-1, -1]
         self._select_shape()
 
+        self.scoreboard = Scoreboard()
+
     def _init_grid(self):
         for row in range(len(self.grid)):
             for col in range(len(self.grid[0])):
@@ -27,15 +31,26 @@ class Tetris:
                     self.grid[row][col] = Constants.BORDER_SPACE
 
     def _print_grid(self):
-        for row in self.grid:
-            for col in row:
-                print(col, end=" ")
+        printed = False
+        for row in range(len(self.grid)):
+            for col in range(len(self.grid[0])):
+                for piece_row in self.falling_piece.position:
+                    if row == self.falling_piece_position[0] + piece_row[0] and \
+                            col == self.falling_piece_position[1] + piece_row[1]:
+                        print('1', end=" ")
+                        printed = True
+                if not printed:
+                    print(self.grid[row][col], end=" ")
+                else:
+                    printed = False
             print("")
 
     def _select_shape(self):
         self.falling_piece_position = [1, 5]
         self.falling_piece.set_piece(self.next_piece.shape_type)
         self.next_piece.set_piece(random.randrange(0, Piece.SHAPE_NUM))
+
+        print(f'Piece number: {self.falling_piece.shape_type}')
 
     def _can_rotate(self) -> bool:
         if self.falling_piece.shape_type == Piece.SHAPE_NAMES['Square']:
@@ -46,9 +61,9 @@ class Tetris:
             row[0], row[1] = row[1], -1 * row[0]
 
         for p in pos:
-            new_col = self.falling_piece_position[0] + p[0]
-            new_row = self.falling_piece_position[1] + p[1]
-            if self.grid[new_col][new_row] != Constants.EMPTY_SPACE:
+            new_row = self.falling_piece_position[0] + p[0]
+            new_col = self.falling_piece_position[1] + p[1]
+            if self.grid[new_row][new_col] != Constants.EMPTY_SPACE:
                 return False
         return True
 
@@ -59,9 +74,9 @@ class Tetris:
 
     def _can_move(self, direction: Direction) -> bool:
         for row in self.falling_piece.position:
-            new_col = self.falling_piece_position[0] + direction.my_direction[0] + row[0]
-            new_row = self.falling_piece_position[1] + direction.my_direction[1] + row[1]
-            if self.grid[new_col][new_row] != Constants.EMPTY_SPACE:
+            new_row = self.falling_piece_position[0] + direction.my_direction[0] + row[0]
+            new_col = self.falling_piece_position[1] + direction.my_direction[1] + row[1]
+            if self.grid[new_row][new_col] != Constants.EMPTY_SPACE:
                 return False
         return True
 
@@ -69,9 +84,26 @@ class Tetris:
         self.falling_piece_position[0] += direction.my_direction[0]
         self.falling_piece_position[1] += direction.my_direction[1]
 
+    def _shape_has_landed(self):
+        self._add_shape()
+        if self.falling_piece_position[0] < 2:
+            self.scoreboard.game_over = True
+        else:
+            self.scoreboard.add_lines(self._remove_lines())
+        self._select_shape()
+
     def run(self):
-        print("under construction")
-        self._print_grid()
+        print(f'Height : {len(self.grid)}, Width: {len(self.grid[0])}')
+        while not self.scoreboard.game_over:
+            sleep(self.scoreboard.get_speed()/1000)
+            if self._can_move(Direction(Direction.DIRECTION_NAMES['Down'])):
+                self._move(Direction(Direction.DIRECTION_NAMES['Down']))
+            else:
+                self._shape_has_landed()
+            self._print_grid()
+            print(f'Falling piece position: {self.falling_piece_position[0]}, {self.falling_piece_position[1]}')
+            print(f'Level: {self.scoreboard.level}')
+            print("")
 
     def _add_shape(self):
         for row in self.falling_piece.position:

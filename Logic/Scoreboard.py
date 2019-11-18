@@ -10,7 +10,7 @@ class Scoreboard:
 
     def get_speed(self) -> int:
         if self.level == 0:
-            return 700
+            return 100
         elif self.level == 1:
             return 600
         elif self.level == 2:
@@ -39,5 +39,5 @@ class Scoreboard:
         self.add_score(lines_cleared)
         self.lines += lines_cleared
 
-        if self.lines % 10 == 0 and self.level <= Scoreboard.MAX_LEVEL:
+        if self.lines > 0 and self.lines % 10 == 0 and self.level <= Scoreboard.MAX_LEVEL:
             self.level += 1
